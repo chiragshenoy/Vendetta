@@ -1,14 +1,23 @@
 package vendetta.emc.com.vendetta;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.TextView;
+
+import android.widget.ListView;
 import android.widget.Toast;
+
+import com.melnykov.fab.FloatingActionButton;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -23,6 +32,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,50 +50,139 @@ public class MainActivity extends ActionBarActivity {
 
     JSONArray final_json_array;
 
-    String id = "";
+    //    String id = "";
     String url1 = "";
-    TextView tv;
 
     InputStream is = null;
     String result = null;
     String line = null;
     int code;
     String college = "";
-    EditText input_et;
+    String content;
+    String roll = "";
 
+    ArrayList<String> array_list_posts;
+    ArrayAdapter<String> adapter;
+    ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        tv = (TextView) findViewById(R.id.tv);
-        input_et = (EditText) findViewById(R.id.editText1);
-
         client = new DefaultHttpClient();
 
-        Button insert = (Button) findViewById(R.id.button1);
+        new Read().execute();
+//        Bundle bundle = getIntent().getExtras();
 
-        insert.setOnClickListener(new View.OnClickListener() {
+        array_list_posts = new ArrayList<String>();
+
+//        college = bundle.getString("college_name");
+
+        Context context = getApplicationContext();
+        AppPrefs appPrefs = new AppPrefs(context);
+        college = appPrefs.getcollege_saved();
+        roll = appPrefs.getroll_saved();
+
+//ListView Kireeek
+        listView = (ListView) findViewById(R.id.list);
+
+        // Defined Array values to show in ListView
+//        String[] values = new String[]{"Android List View",
+//                "Adapter implementation",
+//                "Simple List View In Android",
+//                "Create List View Android",
+//                "Android Example",
+//                "List View Source Code",
+//                "List View Array Adapter",
+//                "Android Example List View"
+//        };
+
+        String values[] = new String[array_list_posts.size()];
+        values = array_list_posts.toArray(values);
+        // Define a new Adapter
+        // First parameter - Context
+        // Second parameter - Layout for the row
+        // Third parameter - ID of the TextView to which the data is written
+        // Forth - the Array of data
+
+        adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1, android.R.id.text1, values);
+
+
+        // Assign adapter to ListView
+
+
+        // ListView Item Click Listener
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
 
-                new Inserting().execute();
+                // ListView Clicked item index
+                int itemPosition = position;
+
+                // ListView Clicked item value
+                String itemValue = (String) listView.getItemAtPosition(position);
+
+                // Show Alert
+                Toast.makeText(getApplicationContext(),
+                        "Position :" + itemPosition + "  ListItem : " + itemValue, Toast.LENGTH_LONG)
+                        .show();
+
             }
+
         });
 
+//End of ListView
 
-        Button retrieve = (Button) findViewById(R.id.button2);
-        retrieve.setOnClickListener(new View.OnClickListener() {
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                college = input_et.getText().toString();
-                new Read().execute();
+                LayoutInflater li = LayoutInflater.from(MainActivity.this);
+                View promptsView = li.inflate(R.layout.prompts, null);
+
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                        MainActivity.this);
+
+                // set prompts.xml to alertdialog builder
+                alertDialogBuilder.setView(promptsView);
+
+                final EditText userInput = (EditText) promptsView
+                        .findViewById(R.id.editTextDialogUserInput);
+
+                // set dialog message
+                alertDialogBuilder
+                        .setCancelable(false)
+                        .setPositiveButton("OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        // get user input and set it to result
+                                        // edit text
+                                        content = (userInput.getText().toString());
+                                        new Inserting().execute();
+
+                                    }
+                                })
+                        .setNegativeButton("Cancel",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+
+                // create alert dialog
+                AlertDialog alertDialog = alertDialogBuilder.create();
+
+                // show it
+                alertDialog.show();
 
             }
+
         });
+
 
     }
 
@@ -108,9 +207,9 @@ public class MainActivity extends ActionBarActivity {
     public void insert() {
         ArrayList<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 
-        nameValuePairs.add(new BasicNameValuePair("content", "This is from the app"));
-        nameValuePairs.add(new BasicNameValuePair("college", "JSSATE"));
-
+        nameValuePairs.add(new BasicNameValuePair("content", content));
+        nameValuePairs.add(new BasicNameValuePair("college", college));
+        nameValuePairs.add(new BasicNameValuePair("posted_by", roll));
 
         try {
             HttpClient httpclient = new DefaultHttpClient();
@@ -188,8 +287,10 @@ public class MainActivity extends ActionBarActivity {
 
                     for (int i = 0; i < final_json_array.length(); i++) {
                         JSONObject jsonobject = final_json_array.getJSONObject(i);
-                        id += jsonobject.getString("id");
-                        url1 += jsonobject.getString("content");
+//                        id += jsonobject.getString("id");
+//                        url1 += jsonobject.getString("content");
+                        array_list_posts.add(jsonobject.getString("content"));
+
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -211,8 +312,8 @@ public class MainActivity extends ActionBarActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-
-            tv.setText(id + " " + url1);
+            listView.setAdapter(adapter);
+            listView.notifyDatasetChanged();
         }
     }
 }
