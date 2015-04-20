@@ -43,7 +43,7 @@ public class MainActivity extends ActionBarActivity {
     String id = "";
     String url1 = "";
     TextView tv;
-cv
+
     InputStream is = null;
     String result = null;
     String line = null;
