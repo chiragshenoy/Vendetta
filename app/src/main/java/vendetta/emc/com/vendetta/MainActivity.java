@@ -313,7 +313,7 @@ public class MainActivity extends ActionBarActivity {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             listView.setAdapter(adapter);
-            listView.notifyDatasetChanged();
+//            listView.notifyDatasetChanged();
         }
     }
-} 
+}
