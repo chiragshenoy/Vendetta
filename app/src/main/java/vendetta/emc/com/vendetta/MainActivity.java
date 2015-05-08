@@ -1,6 +1,7 @@
 package vendetta.emc.com.vendetta;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
@@ -11,9 +12,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.melnykov.fab.FloatingActionButton;
@@ -38,11 +41,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity {
 
     HttpClient client;
+    ProgressDialog pDialog;
 
     String URL = "http://evilmc.comlu.com/result.php?q=";
 
@@ -60,18 +65,22 @@ public class MainActivity extends ActionBarActivity {
     String college = "";
     String content;
     String roll = "";
-
+    List<String> listContents;
     ArrayList<String> array_list_posts;
     ArrayAdapter<String> adapter;
     ListView listView;
+    Button upvote,downvote;
+    TextView updownCount;
+    int counter=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         client = new DefaultHttpClient();
 
-        new Read().execute();
+
 //        Bundle bundle = getIntent().getExtras();
 
         array_list_posts = new ArrayList<String>();
@@ -83,8 +92,10 @@ public class MainActivity extends ActionBarActivity {
         college = appPrefs.getcollege_saved();
         roll = appPrefs.getroll_saved();
 
+        new Read().execute();
 //ListView Kireeek
         listView = (ListView) findViewById(R.id.list);
+
 
         // Defined Array values to show in ListView
 //        String[] values = new String[]{"Android List View",
@@ -97,16 +108,20 @@ public class MainActivity extends ActionBarActivity {
 //                "Android Example List View"
 //        };
 
-        String values[] = new String[array_list_posts.size()];
-        values = array_list_posts.toArray(values);
-        // Define a new Adapter
-        // First parameter - Context
-        // Second parameter - Layout for the row
-        // Third parameter - ID of the TextView to which the data is written
-        // Forth - the Array of data
 
-        adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, android.R.id.text1, values);
+
+
+
+// I didnt understand this shit.. i have set up the adapter in onPostExecute.. -Kai
+
+            // Define a new Adapter
+            // First parameter - Context
+            // Second parameter - Layout for the row
+            // Third parameter - ID of the TextView to which the data is written
+            // Forth - the Array of data
+
+            /*adapter = new ArrayAdapter<String>(this,
+                    android.R.layout.simple_list_item_1, android.R.id.text1, values);*/
 
 
         // Assign adapter to ListView
@@ -267,6 +282,7 @@ public class MainActivity extends ActionBarActivity {
         if (status == 200) {
             HttpEntity e = r.getEntity();
             String data = EntityUtils.toString(e);
+
             json_array_got = new JSONArray(data);
 
             return json_array_got;
@@ -285,13 +301,30 @@ public class MainActivity extends ActionBarActivity {
                 final_json_array = get_entire_json();
                 try {
 
-                    for (int i = 0; i < final_json_array.length(); i++) {
-                        JSONObject jsonobject = final_json_array.getJSONObject(i);
-//                        id += jsonobject.getString("id");
-//                        url1 += jsonobject.getString("content");
-                        array_list_posts.add(jsonobject.getString("content"));
+                    int length = json_array_got.length();
+                    listContents = new ArrayList<String>(length);
+                    for (int i = 0; i < length; i++)
 
+                    {
+                        JSONObject jsonobject = json_array_got.getJSONObject(i);
+                        String name = jsonobject.getString("content");
+                        listContents.add(name);
+                        //listContents.add(json_array_got.getString(i));
                     }
+
+                    //for (int i = 0; i < final_json_array.length(); i++) {
+
+
+
+
+                       /* JSONObject jsonobject = final_json_array.getJSONObject(i);
+//                        id += jsonobject.getString("id");
+                       url1 += jsonobject.getString("content");
+                        Log.d(url1,url1);
+
+                        array_list_posts.add(jsonobject.getString("content"));*/
+
+                  //  }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -308,10 +341,26 @@ public class MainActivity extends ActionBarActivity {
 
             return null;
         }
+        @Override
+        protected void onPreExecute() {
+            // Showing progress dialog before sending http request
+            pDialog = new ProgressDialog(MainActivity.this);
+            pDialog.setMessage("Please wait..");
+            pDialog.setIndeterminate(true);
+            pDialog.setCancelable(false);
+            pDialog.show();        }
 
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
+            pDialog.dismiss();
+            String values[] = new String[array_list_posts.size()];
+           // String values[]={"hello","world"};
+           // values = array_list_posts.toArray(values);
+
+
+            adapter = new ArrayAdapter<String>(getApplicationContext(),
+                    R.layout.row, R.id.label, listContents);
             listView.setAdapter(adapter);
 //            listView.notifyDatasetChanged();
         }
