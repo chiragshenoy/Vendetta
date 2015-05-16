@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.inputmethodservice.Keyboard;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -64,9 +65,11 @@ public class MainActivity extends ActionBarActivity {
     int code;
     String college = "";
     String content;
+    RowData ob;
     String roll = "";
     List<String> listContents;
     ArrayList<String> array_list_posts;
+    ArrayList<RowData> rowDataList ;
     ArrayAdapter<String> adapter;
     ListView listView;
     Button upvote,downvote;
@@ -152,7 +155,7 @@ public class MainActivity extends ActionBarActivity {
 //End of ListView
 
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+      /*  FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -196,7 +199,7 @@ public class MainActivity extends ActionBarActivity {
 
             }
 
-        });
+        });*/
 
 
     }
@@ -303,11 +306,18 @@ public class MainActivity extends ActionBarActivity {
 
                     int length = json_array_got.length();
                     listContents = new ArrayList<String>(length);
+                    rowDataList = new ArrayList<RowData>(length);
                     for (int i = 0; i < length; i++)
 
                     {
                         JSONObject jsonobject = json_array_got.getJSONObject(i);
                         String name = jsonobject.getString("content");
+                         ob = new RowData();
+                        RowData hi = new RowData();
+                        ob.setTex(name);
+                        Log.d(ob.getTex(),"GOT TEXT BOYSA ");
+                        rowDataList.add(ob);
+
                         listContents.add(name);
                         //listContents.add(json_array_got.getString(i));
                     }
@@ -359,10 +369,14 @@ public class MainActivity extends ActionBarActivity {
            // values = array_list_posts.toArray(values);
 
 
-            adapter = new ArrayAdapter<String>(getApplicationContext(),
-                    R.layout.row, R.id.label, listContents);
-            listView.setAdapter(adapter);
-//            listView.notifyDatasetChanged();
+            CustomArrayAdapter dataAdapter = new CustomArrayAdapter(MainActivity.this, R.id.label, rowDataList);
+            listView.setAdapter(dataAdapter);
+
+           /* adapter = new ArrayAdapter<String>(getApplicationContext(),
+                   R.layout.row, R.id.label, listContents);
+            listView.setAdapter(adapter);*/
+
+// listView.notifyDatasetChanged();
         }
     }
 }
