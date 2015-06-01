@@ -1,26 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#0A2B2F"
+    android:orientation="vertical">
 
-    <EditText
+    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="Enter college name"
-        android:id="@+id/college_getter" />
+        android:src="@drawable/hoot_logo" />
 
     <EditText
-        android:layout_width="wrap_content"
+        android:id="@+id/college_getter"
+        android:layout_width="220dp"
         android:layout_height="wrap_content"
-        android:hint="Enter Roll number"
-        android:id="@+id/roll_getter" />
+        android:textColorHint="#bbbbbb"
+        android:layout_gravity="center_horizontal"
+        android:hint="Enter college name" />
+
+    <EditText
+        android:id="@+id/roll_getter"
+        android:layout_width="220dp"
+        android:textColorHint="#bbbbbb"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:hint="Enter Roll number" />
 
 
     <Button
-        android:layout_width="wrap_content"
         android:id="@+id/go"
+        android:layout_width="220dp"
         android:layout_height="wrap_content"
-        android:text="Go" />
+        android:layout_gravity="center_horizontal"
+        android:text="Login" />
 
 </LinearLayout>

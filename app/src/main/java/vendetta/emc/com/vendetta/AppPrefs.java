@@ -25,7 +25,7 @@ public class AppPrefs {
     public void setcollege_saved(String _college_saved) {
         prefsEditor.putString(college_saved, _college_saved).commit();
     }
-//college name end
+    //college name end
 
     //Roll
     public String getroll_saved() {
@@ -35,8 +35,7 @@ public class AppPrefs {
     public void setroll_saved(String _roll_saved) {
         prefsEditor.putString(roll_saved, _roll_saved).commit();
     }
-
-//End roll
+    //End roll
 
 
 }

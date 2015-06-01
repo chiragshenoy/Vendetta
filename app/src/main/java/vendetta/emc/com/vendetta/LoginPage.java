@@ -1,9 +1,9 @@
 package vendetta.emc.com.vendetta;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,7 +11,7 @@ import android.widget.EditText;
 /**
  * Created by Chirag on 20-04-2015.
  */
-public class LoginPage extends ActionBarActivity {
+public class LoginPage extends Activity {
 
     EditText college_getter, roll_getter;
     Button go;
@@ -40,7 +40,7 @@ public class LoginPage extends ActionBarActivity {
                 appPrefs.setroll_saved(roll_number);
 
 
-                Intent intent = new Intent(LoginPage.this, MainActivity.class);
+                Intent intent = new Intent(LoginPage.this, ScreenSlidePagerActivity.class);
                 intent.putExtra("college_name", college_name);
                 intent.putExtra("roll_number", roll_number);
                 startActivity(intent);
